@@ -27,9 +27,7 @@ Base = automap_base()
 Base.prepare(db.engine, reflect=True)
 
 # Save references to each table
-Samples_Metadata = Base.classes.sample_metadata
-Samples = Base.classes.samples
-
+food_db = Base.classes.Food_file
 
 @app.route("/")
 def index():
@@ -39,14 +37,16 @@ def index():
 
 @app.route("/data")
 def names():
-    """Return a list of sample names."""
+    """Return all data."""
 
     # Use Pandas to perform the sql query
-    stmt = db.session.query(Samples).statement
+    stmt = db.session.query(food_db).statement
     df = pd.read_sql_query(stmt, db.session.bind)
 
-    # Return a list of the column names (sample names)
-    return jsonify(list(df.columns))
+    data = df.to_json(orient='records')
+
+    # return data in json objects
+    return data
 
 if __name__ == "__main__":
     app.run()
