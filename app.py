@@ -36,7 +36,7 @@ def index():
 
 
 @app.route("/data")
-def names():
+def allData():
     """Return all data."""
 
     # Use Pandas to perform the sql query
@@ -44,9 +44,47 @@ def names():
     df = pd.read_sql_query(stmt, db.session.bind)
 
     data = df.to_json(orient='records')
-
     # return data in json objects
     return data
+
+@app.route("/data/<start_date>/<end_date>")
+def start_end(start_date, end_date):
+    """Return filtered data between start and end date."""
+    #dates appear in the format : 2012-08-01
+    start_date = start_date.replace("-","/")
+    end_date = end_date.replace("-","/")
+
+    # Use Pandas to perform the sql query
+    start_end_recalls = db.session.query(food_db).\
+        filter(food_db.recall_date >= start_date).\
+        filter(food_db.recall_date <= end_date).group_by(food_db.recall_date).statement
+    
+
+    df = pd.read_sql_query(start_end_recalls, db.session.bind)
+    recalls_list = df.to_json(orient='records')
+    
+    return recalls_list
+
+@app.route("/data/<classification>/<start_date>/<end_date>")
+def class_start_end(start_date, end_date, classification):
+    """Return filtered data between start and end date and filter by class."""
+    #dates appear in the format : 2012-08-01
+    start_date = start_date.replace("-","/")
+    end_date = end_date.replace("-","/")
+
+    #classification appears in this format : Class I
+
+    # Use Pandas to perform the sql query
+    start_end_class_recalls = db.session.query(food_db).\
+        filter(food_db.recall_date >= start_date).\
+        filter(food_db.recall_date <= end_date).\
+        filter(food_db.classification == classification).group_by(food_db.recall_date).statement
+    
+
+    df = pd.read_sql_query(start_end_class_recalls, db.session.bind)
+    recalls_class_list = df.to_json(orient='records')
+    
+    return recalls_class_list
 
 if __name__ == "__main__":
     app.run()
