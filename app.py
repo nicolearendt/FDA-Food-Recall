@@ -54,6 +54,13 @@ def start_end(start_date, end_date):
     start_date = start_date.replace("-","/")
     end_date = end_date.replace("-","/")
 
+    print(end_date)
+
+    if len(end_date) < 10:
+        end_date = end_date + "/31"
+
+    print(end_date)
+
     # Use Pandas to perform the sql query
     start_end_recalls = db.session.query(food_db).\
         filter(food_db.recall_date >= start_date).\
@@ -71,6 +78,13 @@ def class_start_end(start_date, end_date, classification):
     #dates appear in the format : 2012-08-01
     start_date = start_date.replace("-","/")
     end_date = end_date.replace("-","/")
+
+    print(end_date)
+
+    if len(end_date) < 10:
+        end_date = end_date + "/31"
+
+    print(end_date)
 
     #classification appears in this format : Class I
 
